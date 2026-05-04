@@ -66,35 +66,35 @@ function App() {
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY)
-    if (!saved) {
-      return
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved) as {
+          mode?: 'salaried' | 'hourly'
+          salariedConfig?: SalariedConfig
+          hourlyRate?: number
+          currency?: string
+          hourlySession?: HourlySessionState
+        }
+        if (parsed.mode === 'salaried' || parsed.mode === 'hourly') {
+          setMode(parsed.mode)
+        }
+        if (parsed.salariedConfig) {
+          setSalariedConfig(parsed.salariedConfig)
+        }
+        if (typeof parsed.hourlyRate === 'number') {
+          setHourlyRate(parsed.hourlyRate)
+        }
+        if (typeof parsed.currency === 'string') {
+          setCurrency(parsed.currency)
+        }
+        if (parsed.hourlySession) {
+          setHourlySession(parsed.hourlySession)
+        }
+      } catch {
+        // Invalid local data should not block app startup.
+      }
     }
-    try {
-      const parsed = JSON.parse(saved) as {
-        mode?: 'salaried' | 'hourly'
-        salariedConfig?: SalariedConfig
-        hourlyRate?: number
-        currency?: string
-        hourlySession?: HourlySessionState
-      }
-      if (parsed.mode === 'salaried' || parsed.mode === 'hourly') {
-        setMode(parsed.mode)
-      }
-      if (parsed.salariedConfig) {
-        setSalariedConfig(parsed.salariedConfig)
-      }
-      if (typeof parsed.hourlyRate === 'number') {
-        setHourlyRate(parsed.hourlyRate)
-      }
-      if (typeof parsed.currency === 'string') {
-        setCurrency(parsed.currency)
-      }
-      if (parsed.hourlySession) {
-        setHourlySession(parsed.hourlySession)
-      }
-    } catch {
-      // Invalid local data should not block app startup.
-    }
+
     setHasHydratedFromStorage(true)
   }, [])
 
